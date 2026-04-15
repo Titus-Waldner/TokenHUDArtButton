@@ -65,9 +65,10 @@ class ShowArt {
 		game.canvas.activeLayer.controlled.forEach(object => {
 			const { image, title } = this.getObjectData(object, altImage);
 			if (!image) return;
-
-			const pop = this.createImagePopup(image, title);
-			if (!keybind.isAlt && game.user.isGM) pop.shareImage();
+			Promise.resolve(this.createImagePopup(image, title)).then((pop) => {
+				if (!keybind.isAlt && game.user.isGM) pop.shareImage();
+			});
+			
 		});
 	}
 
@@ -146,8 +147,9 @@ class ShowArt {
 	static keyEventHandler(event, image, title) {
 		if (event.target.id == "chat-message") return;
 		if (event.shiftKey && (event.key == "Z" || event.key == "X")) {
-			const pop = this.createImagePopup(image, title);
-			if (!event.altKey && game.user.isGM) pop.shareImage();
+			Promise.resolve(this.createImagePopup(image, title)).then(pop => {
+				if (!event.altKey && game.user.isGM) pop.shareImage();
+			});
 		}
 	}
 	/**
@@ -160,8 +162,9 @@ class ShowArt {
 	 * @memberof ShowArt
 	 */
 	static buttonEventHandler(event, image, title) {
-		const pop = this.createImagePopup(image, title);
-		if (event.shiftKey && game.user.isGM) pop.shareImage();
+		Promise.resolve(this.createImagePopup(image, title)).then(pop => {
+			if (event.shiftKey && game.user.isGM) pop.shareImage();
+		});
 	}
 	/**
 	 * Creates and renders and ImagePopout
@@ -209,7 +212,7 @@ class ShowArt {
 				dn = token.displayName;
 
 		if (dn == M.ALWAYS || dn == M.HOVER) return {
-			actor: token.actorData.name || actor.name,
+			actor: token.actorData?.name || actor.name,
 			token: token.name,
 		}
 
@@ -234,9 +237,9 @@ class ShowArt {
 	 */
 	static getTokenImages(token, actor) {
 		const mystery = "icons/svg/mystery-man.svg";
-		const synthActor = token.actorData;
 
-		let actorImg = synthActor.img || actor.img;
+
+		let actorImg = token.actorData?.img || actor.img;
 		let tokenImg = token.texture.src;
 
 		const am = actorImg === mystery;
@@ -284,15 +287,16 @@ class ShowArt {
 		const titles = this.getTokenTitles(token, actor);
 		const artButton = this.createButton();
 
-		$(artButton)
-			.click((event) =>
-				this.buttonEventHandler(event, images.actor, titles.actor)
-			)
-			.contextmenu((event) =>
+		artButton
+			.addEventListener('click', (event) => {
+				this.buttonEventHandler(event, images.actor, titles.actor);
+		});
+		artButton
+			.addEventListener('contextmenu', (event) => {
 				this.buttonEventHandler(event, images.token, titles.token)
-			);
+			});
 
-		html.find("div.left").append(artButton);
+		html.querySelector("div.left").append(artButton);
 	}
 	/**
 	 * Adds the button to the Tile HUD,
@@ -307,14 +311,14 @@ class ShowArt {
 	static prepTileHUD(hud, html, tile) {
 		const artButton = this.createButton();
 
-		$(artButton)
-			.click((event) =>
+		artButton
+			.addEventListener('click', (event) =>
 				this.buttonEventHandler(
-					event, tile.img,
+					event, tile.img || tile.texture.src,
 					game.i18n.localize("TKNHAB.TileImg")
 				)
 			)
-		html.find("div.left").append(artButton);
+		html.querySelector("div.left").append(artButton);
 	}
 }
 
@@ -340,7 +344,7 @@ class MultiMediaPopout extends ImagePopout {
 			src.slice(-4).toLowerCase()
 		);
 
-		this.options.template = "modules/token-hud-art-button/media-popout.html";
+		options.template = "modules/token-hud-art-button/media-popout.html";
 	}
 
 	/** @override */
@@ -354,9 +358,9 @@ class MultiMediaPopout extends ImagePopout {
 	*/
 	shareImage() {
 		game.socket.emit("module.token-hud-art-button", {
-			image: this.object,
-			title: this.options.title,
-			uuid: this.options.uuid
+			image: this.object || this.options.src,
+			title: this.options.title || this.options.window?.title,
+			uuid: this.options.uuid || this.options.window.id
 		});
 	}
 
