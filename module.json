@@ -16,7 +16,7 @@
 	"version": "100.1.3.0",
 	"compatibility": {
 		"minimum": 10,
-		"verified": 10
+		"verified": 13
 	},
 	"socket": "true",
 	"scripts": [
@@ -29,16 +29,7 @@
 			"path": "lang/en.json"
 		}
 	],
-	"manifest": "https://github.com/zeel01/TokenHUDArtButton/releases/latest/download/module.json",
-	"url": "https://github.com/zeel01/TokenHUDArtButton",
-	"download": "https://github.com/zeel01/TokenHUDArtButton/releases/latest/download/artbutton.zip",
-	"readme": "https://github.com/zeel01/TokenHUDArtButton/blob/master/readme.md",
-	"bugs": "https://github.com/zeel01/TokenHUDArtButton/issues",
-	"changelog": "https://github.com/zeel01/TokenHUDArtButton/releases",
-	"media": [
-		{
-			"type": "icon",
-			"url": "https://avatars2.githubusercontent.com/u/1721836"
-		}
-	]
+	  "url": "https://github.com/Titus-Waldner/TokenHUDArtButton",
+	  "manifest": "https://github.com/Titus-Waldner/TokenHUDArtButton/releases/download/FoundryVTT/module.json",
+	  "download": "https://github.com/Titus-Waldner/TokenHUDArtButton/archive/refs/tags/FoundryVTT.zip",
 }
